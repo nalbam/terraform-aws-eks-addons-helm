@@ -1,0 +1,57 @@
+nameOverride: cluster-autoscaler
+
+cloudProvider: aws
+
+awsRegion: ap-northeast-2
+
+autoDiscovery:
+  enabled: true
+  clusterName: eks-demo
+
+image:
+  repository: k8s.gcr.io/autoscaling/cluster-autoscaler
+  tag: v1.18.3
+
+extraArgs:
+  logtostderr: true
+  stderrthreshold: info
+  v: 4
+  scale-down-enabled: true
+  scale-down-utilization-threshold: 0.6
+  skip-nodes-with-local-storage: false
+  skip-nodes-with-system-pods: false
+  expander: least-waste
+
+tolerations:
+  - key: group
+    operator: Equal
+    value: operation
+    effect: NoSchedule
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: group
+              operator: In
+              values:
+                - operation
+
+# podAnnotations:
+#   cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+#   iam.amazonaws.com/role: "eks-demo-asg"
+
+# sslCertPath: /etc/ssl/certs/ca-bundle.crt
+
+rbac:
+  create: true
+  # serviceAccount:
+  #   annotations:
+  #     eks.amazonaws.com/role-arn: IAM_ROLE_ARN
+
+serviceMonitor:
+  enabled: false
+  namespace: addon-prometheus
+  selector:
+    release: prometheus-operator

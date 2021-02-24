@@ -1,0 +1,82 @@
+# Kubernetes 1.16+
+# Helm 3+
+
+fullnameOverride: kube-prometheus-stack
+
+prometheusOperator:
+  tolerations:
+    - key: group
+      operator: Equal
+      value: monitoring
+      effect: NoSchedule
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: group
+                operator: In
+                values:
+                  - monitoring
+
+prometheus:
+  prometheusSpec:
+    tolerations:
+      - key: group
+        operator: Equal
+        value: monitoring
+        effect: NoSchedule
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: group
+                  operator: In
+                  values:
+                    - monitoring
+
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 100Gi
+
+    ruleSelector:
+      matchLabels:
+        role: alert-rules
+
+grafana:
+  additionalDataSources:
+    # https://grafana.com/grafana/dashboards/
+    - name: kube-cluster
+      gnetId: 9797
+      revision: 14
+      datasource: Prometheus
+    - name: kube-deployment
+      gnetId: 9679
+      revision: 9
+      datasource: Prometheus
+
+alertmanager:
+  alertmanagerSpec:
+    tolerations:
+      - key: group
+        operator: Equal
+        value: monitoring
+        effect: NoSchedule
+
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: group
+                  operator: In
+                  values:
+                    - monitoring
