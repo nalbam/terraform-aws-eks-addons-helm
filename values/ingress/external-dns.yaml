@@ -1,0 +1,33 @@
+nameOverride: external-dns
+
+sources:
+  - service
+  # - ingress
+
+tolerations:
+  - key: group
+    operator: Equal
+    value: operation
+    effect: NoSchedule
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: group
+              operator: In
+              values:
+                - operation
+
+# podAnnotations:
+#   cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+#   iam.amazonaws.com/role: "eks-demo-dns"
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: IAM_ROLE_ARN

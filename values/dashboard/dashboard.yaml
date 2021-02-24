@@ -1,0 +1,22 @@
+nameOverride: dashboard
+
+extraArgs:
+  - --enable-skip-login
+  - --enable-insecure-login
+  # - --system-banner="Welcome to Kubernetes"
+
+tolerations:
+  - key: group
+    operator: Equal
+    value: operation
+    effect: NoSchedule
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: group
+              operator: In
+              values:
+                - operation

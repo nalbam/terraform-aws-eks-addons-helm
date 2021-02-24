@@ -1,0 +1,128 @@
+nameOverride: grafana
+
+adminUser: "admin"
+adminPassword: "password"
+
+tolerations:
+  - key: group
+    operator: Equal
+    value: monitoring
+    effect: NoSchedule
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: group
+              operator: In
+              values:
+                - monitoring
+
+grafana.ini:
+  # https://grafana.com/docs/grafana/latest/auth/google/
+  auth.google:
+    enabled: false
+    allow_sign_up: true
+    client_id: GOOGLE_CLIENT_ID
+    client_secret: GOOGLE_CLIENT_SECRET
+    scopes: https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+    auth_url: https://accounts.google.com/o/oauth2/auth
+    token_url: https://accounts.google.com/o/oauth2/token
+    allowed_domains: daangn.com
+
+  # https://grafana.com/docs/grafana/latest/auth/github/
+  auth.github:
+    enabled: false
+    allow_sign_up: true
+    client_id: GITHUB_CLIENT_ID
+    client_secret: GITHUB_CLIENT_SECRET
+    scopes: user:email,read:org
+    auth_url: https://github.com/login/oauth/authorize
+    token_url: https://github.com/login/oauth/access_token
+    api_url: https://api.github.com/user
+    allowed_organizations: daangn
+    team_ids: devops
+
+sidecar:
+  dashboards:
+    enabled: true
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+persistence:
+  enabled: true
+  storageClassName: gp2
+  size: 10Gi
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: "http://kube-prometheus-stack-prometheus.addon-prometheus.svc.cluster.local:9090"
+        access: proxy
+        isDefault: true
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+    # https://grafana.com/grafana/dashboards/
+    kube-cluster:
+      gnetId: 9797
+      revision: 14
+      datasource: Prometheus
+    kube-deployment:
+      gnetId: 9679
+      revision: 9
+      datasource: Prometheus
+    jenkins-overview:
+      gnetId: 12444
+      revision: 1
+      datasource: Prometheus
+    jvm-overview:
+      gnetId: 11526
+      revision: 8
+      datasource: Prometheus
+
+    node-exporter:
+      gnetId: 11074
+      revision: 2
+      datasource: Prometheus
+    nodejs-application:
+      gnetId: 11159
+      revision: 1
+      datasource: Prometheus
+    cluster-autoscaler:
+      gnetId: 3831
+      revision: 1
+      datasource: Prometheus
+
+    nginx-ingress:
+      url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
+      datasource: Prometheus
+    argo-cd:
+      url: https://raw.githubusercontent.com/argoproj/argo-cd/master/examples/dashboard.json
+      datasource: Prometheus
+    argo-rollouts:
+      url: https://raw.githubusercontent.com/argoproj/argo-rollouts/master/examples/dashboard.json
+      datasource: Prometheus

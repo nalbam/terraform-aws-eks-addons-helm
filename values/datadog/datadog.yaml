@@ -1,0 +1,45 @@
+nameOverride: datadog
+
+datadog:
+  clusterName: # CLUSTER_NAME
+
+  apiKey: DATADOG_API_KEY
+  apiKeyExistingSecret: # DATADOG_API_KEY_SECRET
+
+  appKey: DATADOG_APP_KEY
+  appKeyExistingSecret: # DATADOG_APP_KEY_SECRET
+
+  kubeStateMetricsEnabled: false
+
+  dogstatsd:
+    useHostPort: true
+    nonLocalTraffic: true
+
+  apm:
+    enabled: true
+
+  # logs:
+  #   enabled: true
+
+agents:
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/disk-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/memory-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/pid-pressure
+      operator: Exists
+    - effect: NoSchedule
+      key: node.kubernetes.io/unschedulable
+      operator: Exists

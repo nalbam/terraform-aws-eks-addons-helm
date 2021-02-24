@@ -1,0 +1,12 @@
+resources: []
+  # - apiVersion: elbv2.k8s.aws/v1beta1
+  #   kind: TargetGroupBinding
+  #   metadata:
+  #     name: NAME
+  #     namespace: NAMESPACE
+  #   spec:
+  #     serviceRef:
+  #       name: SERVICE_NAME
+  #       port: SERVICE_PORT
+  #     targetGroupARN: TARGET_GROUP_ARN
+  #     targetType: ip

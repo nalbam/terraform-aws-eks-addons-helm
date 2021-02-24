@@ -1,0 +1,34 @@
+nameOverride: aws-load-balancer-controller
+
+clusterName: eks-demo
+
+serviceAccount:
+  annotations: {}
+
+tolerations:
+  - key: group
+    operator: Equal
+    value: ingress
+    effect: NoSchedule
+  - key: group
+    operator: Equal
+    value: operation
+    effect: NoSchedule
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: group
+              operator: In
+              values:
+                - operation
+    # preferredDuringSchedulingIgnoredDuringExecution:
+    #   - weight: 1
+    #     preference:
+    #       matchExpressions:
+    #         - key: group
+    #           operator: In
+    #           values:
+    #             - ingress
